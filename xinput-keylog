@@ -24,8 +24,8 @@ xinput test-xi2 --root | perl -lne '
       my ($s, $us) = gettimeofday;
       $us = sprintf("%06d", $us);
       if ($type == 0) {
-          if ($e =~ /^KeyPress/) { $type = 0; }
-          if ($e =~ /^KeyRelease/) { $type = 1; }
+          if ($e =~ /^KeyPress/) { $type = 1; }
+          if ($e =~ /^KeyRelease/) { $type = 0; }
       }
       print {$outfile} "$s.$us $type $detail $k{$detail} @mods";
       $type = 0;
