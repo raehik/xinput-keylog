@@ -6,29 +6,33 @@
 
 xinput test-xi2 --root | perl -lne '
   BEGIN{$"=",";
-    open X, "-|", "xmodmap -pke";
-    for (<X>) {$k{$1}=$2 if /^keycode\s+(\d+) = (\w+)/}
-    open X, "-|", "xmodmap -pm"; <X>;<X>;
-    for (<X>) {if (/^(\w+)\s+(\w*)/){($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}}
+      open X, "-|", "xmodmap -pke";
+      for (<X>) { $k{$1}=$2 if /^keycode\s+(\d+) = (\w+)/ }
+      open X, "-|", "xmodmap -pm"; <X>;<X>;
+      for (<X>) { if (/^(\w+)\s+(\w*)/){ ($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1 } }
   }
+
   use Time::HiRes qw(gettimeofday);
+
   open(my $outfile, ">>", "/home/raehik/data/x11_keystrokes");
-  if (/^EVENT type.*\((.*)\)/) {$e = $1;}
-  elsif (/detail: (\d+)/) {$detail=$1;}
-  elsif (/flags: repeat/) {$type=2;}
+
+  if (/^EVENT type.*\((.*)\)/) { $e = $1; }
+  elsif (/detail: (\d+)/) { $detail = $1; }
+  elsif (/flags: repeat/) { $type = 2; }
   elsif (/modifiers:.*effective: (.*)/) {
-    my $m = $1;
-    if ($e =~ /^Key/){
-      my @mods;
-      for (0..$#m) {push @mods, $m[$_] if (hex($m) & (1<<$_))}
-      my ($s, $us) = gettimeofday;
-      $us = sprintf("%06d", $us);
-      if ($type == 0) {
-          if ($e =~ /^KeyPress/) { $type = 1; }
-          if ($e =~ /^KeyRelease/) { $type = 0; }
+      my $m = $1;
+      if ($e =~ /^Key/) {
+          my @mods;
+          for (0..$#m) { push @mods, $m[$_] if (hex($m) & (1 << $_)) }
+          my ($s, $us) = gettimeofday;
+          $us = sprintf("%06d", $us);
+          if ($type == 0) {
+              if ($e =~ /^KeyPress/) { $type = 1; }
+              if ($e =~ /^KeyRelease/) { $type = 0; }
+          }
+          print { $outfile } "$s.$us $type $detail $k{$detail} @mods";
+          $type = 0;
       }
-      print {$outfile} "$s.$us $type $detail $k{$detail} @mods";
-      $type = 0;
-    }
   }
+
   close $outfile;'
