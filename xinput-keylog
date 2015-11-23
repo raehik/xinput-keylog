@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Log like *all* keystrokes. This is so unreadable, who the fuck wrote
-# it?
+# Log like *all* keystrokes. This is so unreadable, who the fuck wrote it?
 #
 
 xinput test-xi2 --root | perl -lne '
